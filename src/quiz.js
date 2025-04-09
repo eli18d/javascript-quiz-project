@@ -54,6 +54,12 @@ class Quiz {
 
         return total / this.questions.length
     }
+    /* restartQuiz() {
+    quiz.currentQuestionIndex = 0;
+    quiz.correctAnswers = 0;
+    quiz.shuffleQuestions();
+    showQuestion();
+    }                   this is a souvenir of something that should have never been attempted   */
 }
 
 
