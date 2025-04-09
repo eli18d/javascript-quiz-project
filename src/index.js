@@ -99,23 +99,46 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. Show the question
     // Update the inner text of the question container element and show the question text
 
+    questionContainer.innerText = question.text;
+
     
     // 2. Update the green progress bar
     // Update the green progress bar (div#progressBar) width so that it shows the percentage of questions answered
+
+    const percentage = (questions.indexOf(question) / questions.length) * 100;
+    // or ((questions.indexOf(question)+1) / questions.length) * 100;
+    // or (quiz.currentQuestionIndex / quiz.questions.length) * 100; // Calculate the percentage of questions answered
+
     
-    progressBar.style.width = `65%`; // This value is hardcoded as a placeholder
+    
+    progressBar.style.width = `${percentage}%`; // This value is hardcoded as a placeholder
 
-
-
+    
     // 3. Update the question count text 
     // Update the question count (div#questionCount) show the current question out of total questions
     
-    questionCount.innerText = `Question 1 of 10`; //  This value is hardcoded as a placeholder
-
-
+    questionCount.innerText = `Question ${questions.indexOf(question)+1} of ${questions.length}`
     
     // 4. Create and display new radio input element with a label for each choice.
     // Loop through the current question `choices`.
+
+    question.choices.forEach((choice) => {
+      // step 1
+      const newDiv = document.createElement("div");
+
+      // step 2
+      newDiv.innerHTML = `
+        <label>
+          <input type="radio" name="answer" value="${choice}">
+          ${choice}
+        </label>
+        <br>
+      `
+
+      // step 3
+      choiceContainer.appendChild(newDiv)
+    })
+
       // For each choice create a new radio input with a label, and append it to the choice container.
       // Each choice should be displayed as a radio input element with a label:
       /* 
@@ -129,32 +152,27 @@ document.addEventListener("DOMContentLoaded", () => {
       // Hint 4: You can use the `element.innerText` property to set the inner text of an element.
 
   }
-
-
   
-  function nextButtonHandler () {
+  function nextButtonHandler() {
     let selectedAnswer; // A variable to store the selected answer value
 
-
-
-    // YOUR CODE HERE:
-    //
-    // 1. Get all the choice elements. You can use the `document.querySelectorAll()` method.
-
+    // 1. Get all the choice elements
+    const allChoices = document.querySelectorAll("input[name='answer']");
 
     // 2. Loop through all the choice elements and check which one is selected
-      // Hint: Radio input elements have a property `.checked` (e.g., `element.checked`).
-      //  When a radio input gets selected the `.checked` property will be set to true.
-      //  You can use check which choice was selected by checking if the `.checked` property is true.
+    allChoices.forEach((choice) => {
+        if (choice.checked) {
+            selectedAnswer = choice.value; // Get the selected answer value
+        }
+    });
 
-      
-    // 3. If an answer is selected (`selectedAnswer`), check if it is correct and move to the next question
-      // Check if selected answer is correct by calling the quiz method `checkAnswer()` with the selected answer.
-      // Move to the next question by calling the quiz method `moveToNextQuestion()`.
-      // Show the next question by calling the function `showQuestion()`.
-  }  
-
-
+    // 3. If an answer is selected, proceed; otherwise, alert the user
+    if (selectedAnswer) {
+        quiz.checkAnswer(selectedAnswer); // Call the checkAnswer function with the selected answer value
+        quiz.moveToNextQuestion(); // Move to the next question
+        showQuestion(); // Show the next question
+    } 
+}
 
 
   function showResults() {
@@ -168,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
     endView.style.display = "flex";
     
     // 3. Update the result container (div#result) inner text to show the number of correct answers out of total questions
-    resultContainer.innerText = `You scored 1 out of 1 correct answers!`; // This value is hardcoded as a placeholder
+    resultContainer.innerText = `You scored ${quiz.correctAnswers} out of ${quiz.questions.length} correct answers!`; // This value is hardcoded as a placeholder
   }
   
 });
