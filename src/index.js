@@ -52,6 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Create a new Quiz instance object
   const quiz = new Quiz(questions, quizDuration, quizDuration);
+  
+ 
   // Shuffle the quiz questions
   quiz.shuffleQuestions();
 
@@ -66,13 +68,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // Display the time remaining in the time remaining container
   const timeRemainingContainer = document.getElementById("timeRemaining");
   timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+  
 
+    /************  TIMER  ************/
+  
+    let timer;
+
+  startTimer();
+  
+  
   // Show first question
   showQuestion();
 
-  /************  TIMER  ************/
-
-  let timer;
 
   /************  EVENT LISTENERS  ************/
 
@@ -85,14 +92,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // showQuestion() - Displays the current question and its choices
   // nextButtonHandler() - Handles the click on the next button
   // showResults() - Displays the end view and the quiz results
-
+  
   function showQuestion() {
+   
     // If the quiz has ended, show the results
     if (quiz.hasEnded()) {
       showResults();
       return;
     }
-
+     // Start the timer when showing a new question
     // Clear the previous question text and question choices
     questionContainer.innerText = "";
     choiceContainer.innerHTML = "";
@@ -171,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // 3. If an answer is selected, proceed; otherwise, alert the user
+    // 3. If an answer is selected, proceed;
     if (selectedAnswer) {
       quiz.checkAnswer(selectedAnswer); // Call the checkAnswer function with the selected answer value
       quiz.moveToNextQuestion(); // Move to the next question
@@ -181,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showResults() {
     // YOUR CODE HERE:
-    //
+   
     // 1. Hide the quiz view (div#quizView)
     quizView.style.display = "none";
 
@@ -193,16 +201,57 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function restartQuizHandler() {
-    endView.style.display = "none"; // Hide the end view (div#endView)
-    quizView.style.display = "block"; // Show the quiz view (div#quizView)
+    // Hide the end view and show the quiz view
+    endView.style.display = "none";
+    quizView.style.display = "block";
+  
+    // Reset the quiz state
     quiz.currentQuestionIndex = 0;
     quiz.correctAnswers = 0;
     quiz.shuffleQuestions();
+  
+    // Stop the timer and reset it back to quizDuration
+    clearInterval(timer); // Clear the existing timer
+    quiz.timeRemaining = quizDuration; //          <------    THIS IS VERY IMPORTANT
+  
+    // I REALLY NEED THIS PART. I was missing the display update!!!
+    const minutes = Math.floor(quizDuration / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
+    const timeRemainingContainer = document.getElementById("timeRemaining");
+    timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+  
+    // Start the new timer
+    startTimer();
+  
+    // Show the first question again
     showQuestion();
+  }
 
-    /* questionCount.innerText = `Question 1 of ${quiz.questions.length}`;
-    quiz.restartQuiz();               no, no, no no, echos of horrible coding attempts */ 
-
+  function startTimer() {
+   
+    quiz.timeRemaining = quizDuration;           //    <------    THIS IS VERY IMPORTANT
+  
+    timer = setInterval(() => {
+      // Decrease the time remaining by 1 second
+      
+      quiz.timeRemaining -= 1;
+  
+      // Convert the time remaining in seconds to minutes and seconds, and pad the numbers with zeros if needed
+      const minutes = Math.floor(quiz.timeRemaining / 60)
+        .toString()
+        .padStart(2, "0");
+      const seconds = (quiz.timeRemaining % 60).toString().padStart(2, "0");
+  
+      // Display the time remaining in the time remaining container
+      const timeRemainingContainer = document.getElementById("timeRemaining");
+      timeRemainingContainer.innerText = `${minutes}:${seconds}`;
+  
+      
+      
+      
+    }, 1000); // Update every second
   }
 
   
